@@ -1,0 +1,9 @@
+{
+  "custody_weight_granted": "independent_third_party",
+  "declared_trust_domain": "independent_third_party",
+  "envelope_digest": "sha256:9b1c28179e0ed7612c54d53883fc865f69ec845ffcc15f71cb3b11165f29b140",
+  "issuer_attestation_valid": true,
+  "overall_valid": true,
+  "provenance_resolved": "issuer_established",
+  "reason": "issuer-established provenance, attestation verifies against issuer key external to executor; declared independence is supported"
+}

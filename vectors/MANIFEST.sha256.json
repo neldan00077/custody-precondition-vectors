@@ -1,0 +1,6 @@
+{
+  "01_issuer_established_independent": "sha256:9b1c28179e0ed7612c54d53883fc865f69ec845ffcc15f71cb3b11165f29b140",
+  "02_self_asserted_overclaim": "sha256:69248c4c002b0f9bec62abc781a203e36a48fbd3f269bcb78e4faaffc186ad97",
+  "03_self_asserted_honest": "sha256:0165dd290533f4fe7a806a18268866d9306b88043c2a6f0975fe1ea0214ba81a",
+  "04_forged_attestation": "sha256:afda371fd4c3250f37ec85b3a24276752169215d06e225d9718e66a17e813580"
+}

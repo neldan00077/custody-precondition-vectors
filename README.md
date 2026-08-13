@@ -63,7 +63,7 @@ python3 verify.py       # 4/4 vectors verify as specified
 ```
 
 Third-party digest check (no Python needed), matching the published values in
-each `expected.json` and in `MANIFEST.sha256.json`:
+each `expected.json` and in `vectors/MANIFEST.sha256.json`:
 
 ```
 sha256sum vectors/01_issuer_established_independent/canonical.bytes

@@ -2,6 +2,7 @@
   "custody_weight_granted": "same_domain",
   "declared_trust_domain": "same_domain",
   "envelope_digest": "sha256:0165dd290533f4fe7a806a18268866d9306b88043c2a6f0975fe1ea0214ba81a",
+  "failure_code": null,
   "issuer_attestation_valid": false,
   "overall_valid": true,
   "provenance_resolved": "self_asserted",

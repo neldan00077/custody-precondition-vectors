@@ -2,6 +2,7 @@
   "custody_weight_granted": null,
   "declared_trust_domain": "independent_third_party",
   "envelope_digest": "sha256:afda371fd4c3250f37ec85b3a24276752169215d06e225d9718e66a17e813580",
+  "failure_code": "ATTESTATION_INVALID",
   "issuer_attestation_valid": false,
   "overall_valid": false,
   "provenance_resolved": "issuer_established",

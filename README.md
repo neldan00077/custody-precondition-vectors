@@ -54,10 +54,17 @@ is the one that bites — it is the "a compromised runtime mints perfectly-grade
 fields for an identity it issued to itself" case, failing because the executor
 does not hold the issuer key.
 
+Each `expected.json` carries a machine-readable `failure_code` — `null` on a
+pass, and a pinned enum on a MUST-FAIL: `PROVENANCE_INSUFFICIENT_FOR_DECLARED_TRUST_DOMAIN`
+for the overclaim (02) and `ATTESTATION_INVALID` for the forged attestation (04).
+`verify.py` emits it and it is part of the compared contract, so "reject" is
+testable against a stated reason rather than being a bare boolean.
+
 ## Reproduce
 
 ```
 pip install -r requirements.txt
+python3 canon_selftest.py  # 2/2 canonicalization edges match pinned bytes
 python3 generate.py     # writes vectors/, byte-identical each run
 python3 verify.py       # 4/4 vectors verify as specified
 ```
@@ -71,6 +78,47 @@ sha256sum vectors/01_issuer_established_independent/canonical.bytes
 
 The issuer public key is published at `vectors/issuer_pubkey.txt` so anyone can
 verify the attestations in vectors 01 and 04 without trusting this repository.
+
+## Digest context
+
+"JCS + SHA-256" names a family, not a construction. An identifier that only
+names the family lets a verifier know *a* construction was used, not recompute
+it. This set pins the construction so the digests resolve to something immutable
+rather than to prose:
+
+* **Canonicalization** is JCS (RFC 8785), and the canonicalizer is pinned to an
+  exact revision in `requirements.txt` (`rfc8785==0.1.4`), not a floor. The two
+  places "JCS" silently diverges are pinned as known-answer tests in
+  `canon_selftest.py`: property ordering is by **UTF-16 code units** (RFC 8785
+  §3.2.3), not code point; and **no Unicode normalisation** is performed (RFC 8785
+  §3.1). If the installed canonicalizer ever changes either behaviour, that test
+  fails loudly instead of reinterpreting the corpus.
+* **Hash and output representation** are SHA-256 with the digest written as
+  `sha256:` followed by **bare lowercase hex** (no `0x`, no uppercase). Every
+  digest in the corpus is self-describing in this form.
+* **No raw JSON numbers appear in any envelope.** All values are strings, so the
+  ECMAScript number-formatting axis of JCS (e.g. `1.0` folding to `1`) is out of
+  the attack surface for this set by construction. Internal hashes such as
+  `action_key` are computed inside `generate.py` and pinned as strings.
+
+### Reproducing the attestations (vectors 01 and 04)
+
+An independent verifier does not need `verify.py`. The Ed25519 attestation is a
+signature over exactly these bytes:
+
+* Let `binding_obj = {"action_key": <decision.action_key>, "capturer_id":
+  <custody.capturer.id>, "issuer_id": <issuer_attestation.issuer_id>}`.
+* `binding_bytes = JCS(binding_obj)` — the RFC 8785 canonical bytes of that
+  three-field object (JCS sorts the keys into the order shown above). The
+  signature is over these bytes **directly**, not over their digest.
+* `issuer_attestation.binding` is `sha256:` + lowercase-hex of `binding_bytes`,
+  present for human inspection; it is not the signed message.
+* `issuer_attestation.signature` is the raw 64-byte Ed25519 signature, **standard**
+  base64 (not URL-safe). `issuer_attestation.issuer_pubkey` is `ed25519:` +
+  standard base64 of the raw 32-byte public key.
+
+Vector 01 verifies against the published issuer key; vector 04 is the forged case
+and does not, because the executor does not hold that key.
 
 ## Scope — what this does and does not establish
 

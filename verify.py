@@ -112,13 +112,23 @@ def verify(env: dict) -> dict:
     else:  # unestablished / forged
         ceiling = None
 
-    if ceiling is None or RANK[declared] > RANK[ceiling]:
+    # machine-readable outcome code, null on success. A MUST-FAIL vector is only
+    # testable as a rejection if the reason it rejects is pinned and switchable.
+    if ceiling is None:
+        failure_code = "ATTESTATION_INVALID"
+    elif RANK[declared] > RANK[ceiling]:
+        failure_code = "PROVENANCE_INSUFFICIENT_FOR_DECLARED_TRUST_DOMAIN"
+    else:
+        failure_code = None
+
+    if failure_code is not None:
         return {
             "provenance_resolved": provenance,
             "issuer_attestation_valid": att_valid,
             "declared_trust_domain": declared,
             "custody_weight_granted": None,
             "overall_valid": False,
+            "failure_code": failure_code,
         }
 
     return {
@@ -127,6 +137,7 @@ def verify(env: dict) -> dict:
         "declared_trust_domain": declared,
         "custody_weight_granted": declared,
         "overall_valid": True,
+        "failure_code": None,
     }
 
 
@@ -136,6 +147,7 @@ COMPARED = [
     "declared_trust_domain",
     "custody_weight_granted",
     "overall_valid",
+    "failure_code",
 ]
 
 
